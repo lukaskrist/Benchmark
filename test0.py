@@ -2,8 +2,8 @@ import numpy as np
 import benchmark_class
 import ARS_benchmark
 import matplotlib.pyplot as plt
-N = 5
-T = 1.03
+N = 100
+T = 0.03
 
 noise = 0.0 # remember noise is optional
 
@@ -25,16 +25,16 @@ G = two_level.roll_out(alist)
 Tlist = []
 # Note, if the noise is different from zero, you get a different result each time. 
 pulse = np.random.rand(N)
-alpha = 0.1
+alpha = 0.2
 v = 0.5
 maxite = 40
-maxepochs = 20
+maxepochs = 30
 f_story = np.zeros((maxepochs,maxite))
 times = np.zeros((maxepochs,maxite))
 for i in range(maxite):
     T += 0.1
     ARS = ARS_benchmark.ARSTrainer()
-    f_story[:,i],times[:,i] = ARS.train(pulse,N,T,alpha,v,L=5, Noise = noise)
+    f_story[:,i],times[:,i] = ARS.train(pulse,N,T,alpha,v,L=5, Noise = noise,maxepochs=maxepochs)
     Tlist.append(T)
     
 time_average_A = np.average(times,axis = 1)
@@ -49,3 +49,4 @@ ax1.set_ylabel('Fidelity')
 ax1.set_title('QSL ARS graph-Max')
 ax1.legend()
 ax1.set_title('QSL ARS graph')
+fig.show()

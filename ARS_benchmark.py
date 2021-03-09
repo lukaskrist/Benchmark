@@ -12,7 +12,7 @@ import benchmark_class
 
 
 def MaxFunc(M):
-    maxval = 4
+    maxval = 1
     for j in M:
         if j>maxval:
             j = maxval
