@@ -2,7 +2,7 @@ import numpy as np
 import benchmark_class
 import ARS_benchmark
 import matplotlib.pyplot as plt
-N = 100
+N = 40
 T = 0.03
 
 noise = 0.0 # remember noise is optional
@@ -34,7 +34,7 @@ times = np.zeros((maxepochs,maxite))
 for i in range(maxite):
     T += 0.1
     ARS = ARS_benchmark.ARSTrainer()
-    f_story[:,i],times[:,i] = ARS.train(pulse,N,T,alpha,v,L=5, Noise = noise,maxepochs=maxepochs)
+    f_story[:,i],times[:,i] = ARS.train(pulse,N,T,alpha,v,L=2, Noise = noise,maxepochs=maxepochs)
     Tlist.append(T)
     
 time_average_A = np.average(times,axis = 1)
