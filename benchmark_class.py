@@ -97,7 +97,7 @@ class SpinChain:
         
         self.sp = spin_chain.Spin_chain(L)
         
-        self.Hc = np.copy(self.sp.X)
+        self.Hc = -np.copy(self.sp.X)
         
         
         self.psi0 = np.zeros((self.sp.dim), dtype = complex)
@@ -115,7 +115,7 @@ class SpinChain:
         
         self.H0 = np.zeros((self.sp.dim, self.sp.dim), dtype = complex)
         
-        for idx in range(0, self.L-1):
+        for idx in range(0, self.L):
             self.H0 += np.random.normal(loc = self.J, scale = self.noise)*self.sp.get_ZZ(idx, np.mod(idx + 1,self.L))
             
     def observe(self):

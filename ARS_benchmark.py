@@ -13,11 +13,11 @@ import benchmark_class
 
 def MaxFunc(M):
     maxval = 1
-    for j in M:
-        if j>maxval:
-            j = maxval
-        if j<-maxval:
-            j = -maxval
+    for i in range(len(M)):
+        if M[i]>maxval:
+            M[i] = maxval
+        if M[i]< -maxval:
+            M[i] = -maxval
     return M
 def softmax(x):
     """
@@ -78,8 +78,10 @@ class ARSTrainer():
                     delta_plus = MaxFunc(delta_plus)
                     delta_minus = M-samples[i,:]*v
                     delta_minus = MaxFunc(delta_minus)
+                    
                     r_plus = sp.roll_out(delta_plus)
-                    r_minus = sp.roll_out(delta_plus)
+                    r_minus = sp.roll_out(delta_minus)
+                    #if r_plus > 0.15 or r_minus > 0.15:
                     r_plus_list.append(r_plus)
                     r_minus_list.append(r_minus)
                     M_update += alpha/N *(r_plus-r_minus )*samples[i,:]
@@ -88,13 +90,16 @@ class ARSTrainer():
                 # update by choosing the standard deviation
 
                 std = np.std([r_plus_list,r_minus_list])
+                #print(r_plus_list,r_minus_list)
                 if std != 0:
                     M_update /= std
 
+                
+                #if len(r_plus_list)>1:
                 M += M_update
-
-                # this can be omitted, but is good for this specific issue. 
+                M = MaxFunc(M)
                 AccHist.append(np.max([r_plus_list,r_minus_list]))
+                #AccHist.append(sp.roll_out(M))
                 times.append(time.time()-t0)
                 ### END CODE
         if A.any != 0:
@@ -133,4 +138,4 @@ class ARSTrainer():
                 M += M_update
                 AccHist.append(np.max([r_plus_list,r_minus_list]))
                 times.append(time.time()-t0)        
-        return AccHist,times
+        return M,   AccHist,times
