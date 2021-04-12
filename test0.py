@@ -3,9 +3,9 @@ import numpy as np
 import ARS_benchmark
 import matplotlib.pyplot as plt
 N = 20
-T = 1/30
+T = 0.5+1/30
 
-noise = 0.001 # remember noise is optional
+noise = 0.00 # remember noise is optional
 
 #two_level = benchmark_class.TwoLevel(N, T, noise)
 
@@ -29,16 +29,16 @@ pulse = np.random.rand(N)#np.array([ 1.        ,  0.75186758,  0.18700439, -0.90
        # 0.21337512,  0.37883106, -1.        , -1.        , -1.        ,
        #-1.        , -0.90246192,  0.18700451,  0.75186756,  1.        ]) #np.random.rand
 alpha = 0.1
-v = 0.2
-maxite = 40
+v = 0.4
+maxite = 80
 maxepochs = 10
 f_story = np.zeros((maxepochs,maxite))
 times = np.zeros((maxepochs,maxite))
 M_list = np.zeros((N,maxite))
 ARS = ARS_benchmark.ARSTrainer()
-'''
+
 for i in range(maxite):
-    T += 0.1
+    T += 0.05
     M_list[:,i],f_story[:,i],times[:,i] = ARS.train(pulse,N,T,alpha,v,L=5, Noise = noise,maxepochs=maxepochs)
     Tlist.append(T)
 
@@ -51,8 +51,9 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111)
 #ax1.plot(time_average_A,f_story_avg_A,'*',label = "Fidelity max Waveless")
 #ax1.plot(times,f_story,'*',label = "Fidelity max Waveless")
-ax1.plot(Tlist,f_story_max_A,'*',label = "Fidelity max Waveless")
+ax1.plot(Tlist,1-f_story_max_A,'*',label = "Fidelity max Waveless")
 ax1.set_xlabel('T ')
+ax1.set_yscale('log')
 ax1.set_ylabel('Fidelity')
 ax1.set_title('QSL ARS graph-Max')
 #ax1.legend()
@@ -62,7 +63,7 @@ fig.show()
 T = 3.2+1/30
 for i in range(maxite):
     M_list[:,i],f_story[:,i],times[:,i] = ARS.train(pulse,N,T,alpha,v,L=5, Noise = noise,maxepochs=maxepochs)
-    
+
 time_average_A = np.average(times,axis = 1)
 f_story_avg_A = np.average(f_story,axis = 1)
 f_story_std_A = np.std(f_story,axis = 1)
@@ -81,3 +82,4 @@ ax1.set_title('QSL ARS graph-Max')
 ax1.legend()
 ax1.set_title('QSL ARS graph')
 fig.show()
+'''

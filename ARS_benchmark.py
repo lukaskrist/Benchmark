@@ -32,7 +32,7 @@ class ARSTrainer():
         self.N = 20
         
         
-    def train(self,pulse,N,T,alpha,v,maxepochs = 20,data = None,A = np.zeros(1), Noise = None,L = None):
+    def train(self,pulse,N,T,alpha,v,maxepochs = 20,data = np.zeros(1),A = np.zeros(1), Noise = None,L = None):
         """
         Implement Basic random search
         psi = our start configuration of the wave function, will be updated along the way
@@ -61,9 +61,48 @@ class ARSTrainer():
         ### main loop
         t0 = time.time()
         times = []
-#        if data != 0:
-#            thing = data
-#            thing[0] = 1
+        #depends on the data
+        if data.any() != 0:
+            Tlist = np.linspace(1.0, 4.0, 10)
+            idx = 7
+
+            T = Tlist[int(idx)]
+            name = "T"+str(T)
+            name = name.replace('.','_')
+            data = np.load(name + ".npz")
+
+            pulses = data["pulses"] 
+            infidelities = data["infidelities"] 
+            N = pulses.shape[1]
+            F_plus_list = []
+            F_minus_list = []
+            k = 0
+            M_update = M
+            partsize = 20
+            parts = 2000
+            M  = np.zeros(N)
+            for i in range(parts):
+                F_new = 1-infidelities[i]
+                ThetaMinus = M+(M-pulses[i])
+                ThetaMinus = MaxFunc(ThetaMinus)
+                F = sp.roll_out(ThetaMinus)
+                #F = sp.roll_out(M)
+                F_plus_list.append(F_new)
+                F_minus_list.append(F)
+                
+                M_update += alpha/(partsize) *(F_new-F)*(pulses[i])
+                k += 1
+                #M_update = MaxFunc(M_update)
+                if k == partsize:
+                    #M_update /= np.std([F_plus_list,F_minus_list])
+                    #M_update = MaxFunc(M_update)
+                    F_plus_list = []
+                    F_minus_list = []
+                    k = 0
+                    M = M_update
+                    M = MaxFunc(M)
+            print(sp.roll_out(M))
+                
         #if version = Waveless - Spin chain
         if A.all() == 0:
             while epoch < maxepochs:
@@ -102,9 +141,12 @@ class ARSTrainer():
                 #AccHist.append(sp.roll_out(M))
                 times.append(time.time()-t0)
                 ### END CODE
+                
+                
+                
+        #discrete action ARS        
         if A.any != 0:
             delta_A = np.zeros(N)
-            #print(dis_var)
             delta_B = np.zeros(N)
             L = len(pulse)
             while epoch < maxepochs:
@@ -117,8 +159,6 @@ class ARSTrainer():
                 for i in range(p):
                     delta_plus = M+samples[i,:,:]*v
                     delta_minus = M-samples[i,:,:]*v
-                    #delta_plus = MaxFunc(delta_plus)
-                    #delta_minus = MaxFunc(delta_minus)
                     probs_plus = softmax(delta_plus)
                     probs_minus = softmax(delta_minus)
                     for k in range(N):    
@@ -137,5 +177,7 @@ class ARSTrainer():
                     M_update /= std
                 M += M_update
                 AccHist.append(np.max([r_plus_list,r_minus_list]))
-                times.append(time.time()-t0)        
+                times.append(time.time()-t0)  
+        #print(AccHist,times)
+        #print(AccHist)
         return M,   AccHist,times
