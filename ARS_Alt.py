@@ -1,8 +1,9 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Thu Feb 25 10:58:00 2021
+Created on Thu Apr 15 11:09:11 2021
 
-@author: loklu
+@author: lukas
 """
 
 
@@ -74,36 +75,36 @@ class ARSTrainer():
             pulses = data["pulses"] 
             infidelities = data["infidelities"] 
             N = pulses.shape[1]
-            F_plus_list = []
-            F_minus_list = []
+            #F_plus_list = []
+            #F_minus_list = []
             k = 0
             M_update = M
             partsize = 20
             parts = 2000
             M  = np.zeros(N)
+            F = sp.roll_out(M)
             F_list = []
             for i in range(parts):
                 n = randint(0,5000)
                 F_new = 1-infidelities[n]
-                ThetaMinus = M+(M-pulses[n])
-                ThetaMinus = MaxFunc(ThetaMinus)
-                F = sp.roll_out(ThetaMinus)
                 #F = sp.roll_out(M)
-                F_plus_list.append(F_new)
-                F_minus_list.append(F)
-                
-                M_update += 2*alpha/(partsize) *(F_new-F)*(pulses[n])
+                #F_plus_list.append(F_new)
+                #F_minus_list.append(F)
+                if F_new > F:
+                    M_update += 20*alpha/(partsize) *(F_new-F)*(pulses[n]-M)
                 k += 1
                 #M_update = MaxFunc(M_update)
                 if k == partsize:
                     #M_update /= np.std([F_plus_list,F_minus_list])
                     #M_update = MaxFunc(M_update)
-                    F_plus_list = []
-                    F_minus_list = []
+                    #F_plus_list = []
+                    #F_minus_list = []
                     k = 0
                     M = M_update
                     M = MaxFunc(M)
-                    F_list.append(sp.roll_out(M))
+                    F = sp.roll_out(M)
+                    F_list.append(F)
+                    
             print(sp.roll_out(M))
                 
         #if version = Waveless - Spin chain

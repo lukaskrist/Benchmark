@@ -40,6 +40,7 @@ ARS = ARS_benchmark.ARSTrainer()
 for i in range(maxite):
     T += 0.05
     M_list[:,i],f_story[:,i],times[:,i] = ARS.train(pulse,N,T,alpha,v,L=5, Noise = noise,maxepochs=maxepochs)
+    pulse = np.random.rand(N)
     Tlist.append(T)
 
 
