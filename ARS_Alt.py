@@ -91,7 +91,7 @@ class ARSTrainer():
                 #F_plus_list.append(F_new)
                 #F_minus_list.append(F)
                 if F_new > F:
-                    M_update += 20*alpha/(partsize) *(F_new-F)*(pulses[n]-M)
+                    M_update += 4*alpha/(partsize) *(F_new-F)*(pulses[n]-M)
                 k += 1
                 #M_update = MaxFunc(M_update)
                 if k == partsize:

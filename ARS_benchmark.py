@@ -56,12 +56,13 @@ class ARSTrainer():
         epoch = 0
         p = 2*N
         AccHist = []
-        #d = len(psi0)
         M = pulse #np.zeros((l,N))
         ### main loop
         t0 = time.time()
         times = []
         #depends on the data
+        F_list = np.zeros(2)
+        M_list = []
         if data.any() != 0:
             Tlist = np.linspace(1.0, 4.0, 10)
             idx = 7
@@ -70,9 +71,9 @@ class ARSTrainer():
             name = "T"+str(T)
             name = name.replace('.','_')
             data = np.load(name + ".npz")
-
             pulses = data["pulses"] 
             infidelities = data["infidelities"] 
+            data_size = pulses.shape[0]
             N = pulses.shape[1]
             F_plus_list = []
             F_minus_list = []
@@ -83,27 +84,25 @@ class ARSTrainer():
             M  = np.zeros(N)
             F_list = []
             for i in range(parts):
-                n = randint(0,5000)
+                n = randint(0,data_size-1)
                 F_new = 1-infidelities[n]
                 ThetaMinus = M+(M-pulses[n])
                 ThetaMinus = MaxFunc(ThetaMinus)
                 F = sp.roll_out(ThetaMinus)
-                #F = sp.roll_out(M)
                 F_plus_list.append(F_new)
                 F_minus_list.append(F)
                 
-                M_update += 2*alpha/(partsize) *(F_new-F)*(pulses[n])
+                M_update += 2.5*alpha/(partsize) *(F_new-F)*(pulses[n])
                 k += 1
                 #M_update = MaxFunc(M_update)
                 if k == partsize:
-                    #M_update /= np.std([F_plus_list,F_minus_list])
-                    #M_update = MaxFunc(M_update)
                     F_plus_list = []
                     F_minus_list = []
                     k = 0
                     M = M_update
                     M = MaxFunc(M)
                     F_list.append(sp.roll_out(M))
+            M_list = M
             print(sp.roll_out(M))
                 
         #if version = Waveless - Spin chain
@@ -183,4 +182,6 @@ class ARSTrainer():
                 times.append(time.time()-t0)  
         #print(AccHist,times)
         #print(AccHist)
-        return F_list,   AccHist,times
+        #if M_list.any != 0:
+        #M_list = M
+        return M_list, F_list,   AccHist,times
